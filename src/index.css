@@ -1,4 +1,12 @@
 @import "tailwindcss";
-@tailwind base;
-@tailwind components;
+
 @tailwind utilities;
+
+/*Paleta de colores personalizada*/
+@theme{
+  --color-cielo-oscuro: #16697a;
+  --color-cielo: #489fb5;
+  --color-cielo-claro: #82c0cc;
+  --color-fondo-hueso: #ede7e3;
+  --color-amarillo-concreto: #ffa62b;
+}

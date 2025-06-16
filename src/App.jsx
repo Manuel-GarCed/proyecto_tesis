@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/sidebar';
+import './index.css'
 
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
@@ -9,11 +10,30 @@ import Detection from './pages/Detection';
 import Profile from './pages/Profile';
 
 export default function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const toggleSidebar = () => setSidebarOpen(prev => !prev);
+
   return (
     <BrowserRouter>
-      <Sidebar />
+      {/* Sidebar */}
+      <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
-      <div className="ml-64 min-h-screen bg-gray-100">
+      {/* Overlay que cubre el contenido cuando el sidebar está desplegado */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-gray-600 opacity-70 z-40"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Contenido principal */}
+      <div
+        className={`
+          min-h-screen bg-gray-100 p-6
+          transition-all duration-300
+          ${sidebarOpen ? 'ml-64' : 'ml-16'}
+        `}
+      >
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home"          element={<Home />} />
