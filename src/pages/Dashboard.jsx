@@ -1,23 +1,18 @@
 import React from 'react';
-import useSensorData from '../services/useSensorData';
-import TemperatureChart from '../components/TemperatureChart';
-import HumidityChart from '../components/HumidityChart';
-import PhChart from '../components/PhChart';
 
 export default function Dashboard() {
-  const data = useSensorData();
-  console.log("Datos cargados:", data.length, "filas");
-
-console.log(data);
-  
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">Dashboard Avanzado</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <TemperatureChart data={data} />
-        <HumidityChart    data={data} />
-        <PhChart          data={data} />
-      </div>
+    // Este div hereda flex-1 del padre para ocupar todo el alto restante
+    <div className="flex-1 p-6">
+      <h1 className="text-3xl font-bold mb-1">Hola, aquí tu informe general</h1>
+      <iframe
+        title="Power BI Dashboard"
+        width="100%"
+        height="100%"
+        src="https://app.powerbi.com/view?r=eyJrIjoiZDU5YTY2YmQtNTA0Zi00YmU2LWE5ZjctMTE5NjM5YWYwOTdlIiwidCI6IjI1MGY3NmU3LTYxMDUtNDJlMy04MmQwLWJlN2M0NjBhZWE1OSIsImMiOjR9"
+        className="w-full h-full border-0"
+        allowFullScreen
+      />
     </div>
   );
 }

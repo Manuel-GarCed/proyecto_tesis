@@ -29,10 +29,10 @@ export default function App() {
       {/* Contenido principal */}
       <div
         className={`
-          min-h-screen bg-gray-100 p-6
-          transition-all duration-300
-          ${sidebarOpen ? 'ml-64' : 'ml-16'}
-        `}
+         flex flex-col h-screen bg-gray-100
+         transition-all duration-300
+         ${sidebarOpen ? 'ml-64' : 'ml-16'}
+       `}
       >
         <Routes>
           <Route path="/" element={<Navigate to="/home" replace />} />
