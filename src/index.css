@@ -1,12 +1,102 @@
-@import "tailwindcss";
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
-@tailwind utilities;
-
-/*Paleta de colores personalizada*/
-@theme{
+/* Paleta de colores personalizada */
+:root {
   --color-cielo-oscuro: #16697a;
   --color-cielo: #489fb5;
   --color-cielo-claro: #82c0cc;
   --color-fondo-hueso: #ede7e3;
   --color-amarillo-concreto: #ffa62b;
+}
+
+/* Clases de utilidad para usar en Tailwind */
+.bg-color-cielo-oscuro {
+  background-color: var(--color-cielo-oscuro);
+}
+
+.bg-color-cielo {
+  background-color: var(--color-cielo);
+}
+
+.bg-color-cielo-claro {
+  background-color: var(--color-cielo-claro);
+}
+
+.bg-color-fondo-hueso {
+  background-color: var(--color-fondo-hueso);
+}
+
+.bg-color-amarillo-concreto {
+  background-color: var(--color-amarillo-concreto);
+}
+
+.text-color-cielo-oscuro {
+  color: var(--color-cielo-oscuro);
+}
+
+.text-color-cielo {
+  color: var(--color-cielo);
+}
+
+.text-color-cielo-claro {
+  color: var(--color-cielo-claro);
+}
+
+.text-color-fondo-hueso {
+  color: var(--color-fondo-hueso);
+}
+
+.text-color-amarillo-concreto {
+  color: var(--color-amarillo-concreto);
+}
+
+.border-color-cielo-oscuro {
+  border-color: var(--color-cielo-oscuro);
+}
+
+.border-color-cielo {
+  border-color: var(--color-cielo);
+}
+
+.border-color-cielo-claro {
+  border-color: var(--color-cielo-claro);
+}
+
+.border-color-fondo-hueso {
+  border-color: var(--color-fondo-hueso);
+}
+
+.border-color-amarillo-concreto {
+  border-color: var(--color-amarillo-concreto);
+}
+
+.focus\:border-color-cielo:focus {
+  border-color: var(--color-cielo);
+}
+
+.focus\:ring-color-cielo-claro:focus {
+  --tw-ring-color: var(--color-cielo-claro);
+}
+
+.from-color-cielo-oscuro {
+  --tw-gradient-from: var(--color-cielo-oscuro);
+  --tw-gradient-to: rgba(22, 105, 122, 0);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.to-color-cielo {
+  --tw-gradient-to: var(--color-cielo);
+}
+
+/* Animaciones */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }

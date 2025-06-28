@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Notifications from './pages/Notifications';
 import Detection from './pages/Detection';
 import Profile from './pages/Profile';
+import Login from './pages/Login';
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -41,6 +42,7 @@ export default function App() {
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/detection"     element={<Detection />} />
           <Route path="/profile"       element={<Profile />} />
+          <Route path="/login"       element={<Login />} />
         </Routes>
       </div>
     </BrowserRouter>
