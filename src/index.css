@@ -1,9 +1,10 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import "tailwindcss";
+
+
+@tailwind utilities;
 
 /* Paleta de colores personalizada */
-:root {
+@theme{
   --color-cielo-oscuro: #16697a;
   --color-cielo: #489fb5;
   --color-cielo-claro: #82c0cc;

@@ -24,12 +24,12 @@ const Login = ({ setIsAuthenticated }) => {
         setIsAuthenticated(true);
         
         // Redirigir al dashboard
-        navigate('/dashboard');
+        navigate('/home');
       } else {
         setIsLoading(false);
         setErrorMessage('Usuario no autorizado. Solo MANUEL y JONATHAN pueden acceder.');
       }
-    }, 1000);
+    }, 1);
   };
 
   return (
@@ -122,9 +122,9 @@ const Login = ({ setIsAuthenticated }) => {
                 type="submit"
                 disabled={isLoading}
                 className={`
-                  w-full py-3 px-4 rounded-xl font-semibold text-white 
+                  w-full py-3 px-4 rounded-xl font-semibold text-fondo-hueso
                   bg-[#16697a] 
-                  hover:bg-[#ffa62b] hover:text-[#16697a]
+                  hover:bg-amarillo-concreto hover:text-[#16697a]
                   transform hover:-translate-y-0.5
                   transition-all duration-300
                   shadow-md hover:shadow-lg
