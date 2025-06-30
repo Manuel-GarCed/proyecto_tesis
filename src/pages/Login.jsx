@@ -33,11 +33,11 @@ const Login = ({ setIsAuthenticated }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#16697a] to-[#489fb5]">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-cielo-oscuro to-cielo">
       <div className="w-full max-w-4xl bg-white rounded-2xl overflow-hidden shadow-xl">
         <div className="flex flex-col md:flex-row">
           {/* Panel izquierdo */}
-          <div className="flex-1 bg-gradient-to-br from-[#16697a] to-[#489fb5] text-white relative overflow-hidden">
+          <div className="flex-1 bg-gradient-to-br from-cielo-oscuro to-cielo text-white relative overflow-hidden">
             <div className="absolute -top-12 -left-12 w-48 h-48 rounded-full bg-white/10"></div>
             <div className="absolute -bottom-16 -right-16 w-64 h-64 rounded-full bg-white/10"></div>
             
@@ -49,19 +49,22 @@ const Login = ({ setIsAuthenticated }) => {
               
               <div className="space-y-4">
                 <div className="flex items-center">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-3 text-[#ffa62b]">
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center 
+                    justify-center mr-3 text-amarillo-concreto">
                     ✓
                   </div>
                   <span>Detección en tiempo real</span>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-3 text-[#ffa62b]">
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center
+                    justify-center mr-3 text-amarillo-concreto">
                     ✓
                   </div>
                   <span>Análisis de patrones conductuales</span>
                 </div>
                 <div className="flex items-center">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center mr-3 text-[#ffa62b]">
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center
+                    justify-center mr-3 text-amarillo-concreto">
                     ✓
                   </div>
                   <span>Reportes personalizados</span>
@@ -71,14 +74,14 @@ const Login = ({ setIsAuthenticated }) => {
           </div>
           
           {/* Panel derecho */}
-          <div className="flex-1 bg-[#ede7e3] p-8 md:p-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-[#16697a] mb-8 text-center">
+          <div className="flex-1 bg-fondo-hueso p-8 md:p-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-cielo-oscuro mb-8 text-center">
               Iniciar Sesión
             </h2>
             
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="relative">
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#489fb5]">
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-cielo">
                   👤
                 </div>
                 <input
@@ -86,13 +89,14 @@ const Login = ({ setIsAuthenticated }) => {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Usuario"
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:border-[#489fb5] focus:ring-2 focus:ring-[#82c0cc] outline-none transition-all"
+                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-xl
+                    focus:border-cielo focus:ring-2 focus:ring-cielo-claro outline-none transition-all"
                   required
                 />
               </div>
               
               <div className="relative">
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#489fb5]">
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-cielo">
                   🔒
                 </div>
                 <input
@@ -100,7 +104,8 @@ const Login = ({ setIsAuthenticated }) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Contraseña"
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:border-[#489fb5] focus:ring-2 focus:ring-[#82c0cc] outline-none transition-all"
+                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-xl
+                    focus:border-cielo focus:ring-2 focus:ring-cielo-claro outline-none transition-all"
                   required
                 />
               </div>
@@ -110,7 +115,7 @@ const Login = ({ setIsAuthenticated }) => {
                   <input
                     type="checkbox"
                     id="remember"
-                    className="w-4 h-4 text-[#489fb5] border-gray-300 rounded focus:ring-[#489fb5]"
+                    className="w-4 h-4 text-cielo border-gray-300 rounded focus:ring-cielo"
                   />
                   <label htmlFor="remember" className="ml-2 text-gray-700">
                     Recordar usuario
@@ -123,8 +128,8 @@ const Login = ({ setIsAuthenticated }) => {
                 disabled={isLoading}
                 className={`
                   w-full py-3 px-4 rounded-xl font-semibold text-fondo-hueso
-                  bg-[#16697a] 
-                  hover:bg-amarillo-concreto hover:text-[#16697a]
+                  bg-cielo-oscuro 
+                  hover:bg-amarillo-concreto hover:text-cielo-oscuro
                   transform hover:-translate-y-0.5
                   transition-all duration-300
                   shadow-md hover:shadow-lg
@@ -148,11 +153,14 @@ const Login = ({ setIsAuthenticated }) => {
               )}
             </form>
             
-            <div className="mt-8 bg-white rounded-xl p-4 border-l-4 border-[#ffa62b]">
-              <h4 className="font-bold text-[#16697a] mb-3">Requisitos de acceso:</h4>
+            <div className="mt-8 bg-white rounded-xl p-4 border-l-4 border-amarillo-concreto">
+              <h4 className="font-bold text-color-cielo-oscuro mb-3">Requisitos de acceso:</h4>
               <ul className="list-disc pl-5 space-y-1 text-gray-700">
-                <li>Solo los usuarios <span className="font-bold text-[#16697a]">MANUEL</span> y <span className="font-bold text-[#16697a]">JONATHAN</span> pueden ingresar</li>
-                <li>El nombre de usuario debe estar en <span className="font-bold text-[#16697a]">MAYÚSCULAS</span></li>
+                <li>Solo los usuarios
+                  <span className="font-bold text-cielo-oscuro"> MANUEL </span> y 
+                  <span className="font-bold text-cielo-oscuro"> JONATHAN </span> pueden ingresar
+                </li>
+                <li>El nombre de usuario debe estar en <span className="font-bold text-cielo-oscuro">MAYÚSCULAS</span></li>
                 <li>Cualquier contraseña es válida para estos usuarios</li>
               </ul>
             </div>
