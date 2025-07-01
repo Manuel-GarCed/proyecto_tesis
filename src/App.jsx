@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { KeepAlive } from 'react-activation'
 
+import Header from './components/header';
 import Sidebar from './components/sidebar'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
@@ -36,24 +37,33 @@ export default function App() {
 
       <div
         className={`
-          flex-1 flex-col h-screen bg-gray-100 transition-all duration-300
+          flex-1
+          flex flex-col
+          bg-gray-100
+          transition-all duration-300
           ${sidebarOpen ? 'ml-64' : 'ml-16'}
         `}
       >
-        <Routes>
-          {/* redirect raíz a home */}
-          <Route path="/" element={<Navigate to="/home" replace />} />
-          
-          {/* Rutas normales */}
-          <Route path="/home"          element={<Home />} />
-          <Route path="/dashboard"     element={<Dashboard />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/detection"     element={<Detection />} />
-          <Route path="/profile"       element={<Profile />} />
+        {/* Header siempre de altura automática */}
+        <Header />
 
-          {/* Captura cualquier otra y envíala a home */}
-          <Route path="*" element={<Navigate to="/home" replace />} />
-        </Routes>
+        {/* Body que crece, con scroll si hace falta */}
+        <div className="flex-1 overflow-auto">
+          <Routes>
+            {/* redirect raíz a home */}
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            
+            {/* Rutas normales */}
+            <Route path="/home"          element={<Home />} />
+            <Route path="/dashboard"     element={<Dashboard />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/detection"     element={<Detection />} />
+            <Route path="/profile"       element={<Profile />} />
+
+            {/* Captura cualquier otra y envía a home */}
+            <Route path="*" element={<Navigate to="/home" replace />} />
+          </Routes>
+        </div>
       </div>
     </div>
   );

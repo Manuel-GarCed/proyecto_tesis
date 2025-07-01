@@ -1,10 +1,12 @@
 [
   {
     "username": "MANUEL",
-    "password": "soymanuel123"
+    "password": "soymanuel123",
+    "email": "manuel.garciace@ug.edu.ec"
   },
   {
     "username": "JONATHAN",
-    "password": "jonathan456"
+    "password": "jonathan456",
+    "email": "jonathan.quitos@ug.edu.ec"
   }
 ]
