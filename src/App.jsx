@@ -39,6 +39,7 @@ export default function App() {
         className={`
           flex-1
           flex flex-col
+          min-h-0
           bg-gray-100
           transition-all duration-300
           ${sidebarOpen ? 'ml-64' : 'ml-16'}

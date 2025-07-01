@@ -8,7 +8,7 @@ export default function Header() {
   // Mapea rutas a títulos legibles
   const routeTitles = {
     '/home':          'Inicio',
-    '/dashboard':     'Dashboard',
+    '/dashboard':     'Informe General',
     '/notifications': 'Notificaciones',
     '/detection':     'Detección',
     '/profile':       'Perfil',
@@ -24,7 +24,7 @@ export default function Header() {
   };
 
   return (
-    <header className="flex items-center justify-between bg-white px-6 py-4 border-b shadow-sm">
+    <header className="flex items-center justify-between bg-white px-6 h-16 border-b shadow-sm">
       {/* Izquierda: título de la página */}
       <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
 
