@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { validateUser } from '../services/authService'
 
 const Login = ({ setIsAuthenticated }) => {
   const [username, setUsername] = useState('');
@@ -15,22 +16,17 @@ const Login = ({ setIsAuthenticated }) => {
     
     // Simular proceso de autenticación
     setTimeout(() => {
-      const user = username.toUpperCase();
-      
-      if (user === 'MANUEL' || user === 'JONATHAN') {
-        // Guardar el estado de autenticación
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('currentUser', user);
-        setIsAuthenticated(true);
-        
-        // Redirigir al dashboard
-        navigate('/home');
+      if (validateUser(username, password)) {
+        localStorage.setItem('isAuthenticated', 'true')
+        localStorage.setItem('currentUser', username.toUpperCase())
+        setIsAuthenticated(true)
+        navigate('/home')
       } else {
-        setIsLoading(false);
-        setErrorMessage('Usuario no autorizado. Solo MANUEL y JONATHAN pueden acceder.');
+        setIsLoading(false)
+        setErrorMessage('Usuario o contraseña incorrectos.')
       }
-    }, 1);
-  };
+    }, 500)
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-cielo-oscuro to-cielo">
