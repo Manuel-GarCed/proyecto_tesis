@@ -45,7 +45,7 @@ export default function Notifications() {
         </div>
       </div>
 
-      {/* 3) Aquí irá tu Chatbot */}
+      {/* 3) Chatbot NLP */}
       <div className="bg-white p-4 rounded-lg shadow">
         <h2 className="text-xl font-semibold mb-4">Asistente del Huerto</h2>
         {/* placeholder */}
