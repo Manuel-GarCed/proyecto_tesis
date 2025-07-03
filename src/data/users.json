@@ -2,11 +2,13 @@
   {
     "username": "MANUEL",
     "password": "soymanuel123",
-    "email": "manuel.garciace@ug.edu.ec"
+    "email": "manuel.garciace@ug.edu.ec",
+    "telefono": "+593968135960"
   },
   {
     "username": "JONATHAN",
     "password": "jonathan456",
-    "email": "jonathan.quitos@ug.edu.ec"
+    "email": "jonathan.quitos@ug.edu.ec",
+    "telefono": "+593962730274"
   }
 ]

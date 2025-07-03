@@ -1,13 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
+import AuthContext from '../context/AuthContext';
 
-/**
- * Envuelve a tus rutas protegidas.
- * Si isAuthenticated es true, renderiza <Outlet/> (las rutas hijas).
- * Si no, redirige a /login.
- */
-export default function ProtectedRoute({ isAuthenticated }) {
-  return isAuthenticated
-    ? <Outlet />
-    : <Navigate to="/login" replace />;
+export default function ProtectedRoute() {
+  const { isAuthenticated } = useContext(AuthContext);
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 }

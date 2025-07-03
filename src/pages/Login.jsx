@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { validateUser } from '../services/authService'
+import AuthContext from '../context/AuthContext';
 
-const Login = ({ setIsAuthenticated }) => {
+const Login = () => {
+  const { login } = useContext(AuthContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = e => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage('');
@@ -17,9 +19,8 @@ const Login = ({ setIsAuthenticated }) => {
     // Simular proceso de autenticación
     setTimeout(() => {
       if (validateUser(username, password)) {
-        localStorage.setItem('isAuthenticated', 'true')
-        localStorage.setItem('currentUser', username.toUpperCase())
-        setIsAuthenticated(true)
+        login();
+        localStorage.setItem('currentUser', username.toUpperCase());
         navigate('/home')
       } else {
         setIsLoading(false)
