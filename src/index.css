@@ -10,6 +10,8 @@
   --color-cielo-claro: #82c0cc;
   --color-fondo-hueso: #ede7e3;
   --color-amarillo-concreto: #ffa62b;
+  --color-verde-suave: #6faf7c;
+  --color-verde-suave-oscuro: #5a9a65;
 }
 
 /* Clases de utilidad para usar en Tailwind */
