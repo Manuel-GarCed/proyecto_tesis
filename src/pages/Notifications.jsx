@@ -4,6 +4,7 @@ import {
   recommendations as initialRecommendations
 } from '../data/alerts';
 import Modal from '../components/Modal';
+import Chatbot from '../components/Chatbot';
 
 export default function NotificationsPage() {
   // 1) Estado local para recomendaciones
@@ -86,10 +87,9 @@ export default function NotificationsPage() {
         </div>
       </div>
 
-      {/* --- Chatbot placeholder --- */}
-      <div className="bg-white p-4 rounded-lg shadow">
-        <h2 className="text-xl font-semibold mb-4">Asistente del Huerto</h2>
-        <p className="text-gray-500">[Aquí irá el chat]</p>
+      {/* --- Chatbot --- */}
+      <div className="h-96">  {/* altura fija o ajusta a tu gusto */}
+        <Chatbot />
       </div>
 
       {/* --- Modal de confirmación --- */}

@@ -10,8 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@nlpjs/basic": "^5.0.0-alpha.5",
+    "@nlpjs/core": "^5.0.0-alpha.5",
+    "@nlpjs/lang-es": "^5.0.0-alpha.5",
     "@tailwindcss/vite": "^4.1.10",
+    "events": "^3.3.0",
     "papaparse": "^5.5.3",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
