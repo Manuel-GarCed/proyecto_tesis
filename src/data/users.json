@@ -1,14 +1,20 @@
-[
-  {
-    "username": "MANUEL",
-    "password": "soymanuel123",
-    "email": "manuel.garciace@ug.edu.ec",
-    "telefono": "+593968135960"
-  },
-  {
-    "username": "JONATHAN",
-    "password": "jonathan456",
-    "email": "jonathan.quitos@ug.edu.ec",
-    "telefono": "+593962730274"
-  }
-]
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "MANUEL",
+      "password": "manolo123456",
+      "email": "manuel.garciace@ug.edu.ec",
+      "telefono": "+593968135960",
+      "avatarUrl": ""
+    },
+    {
+      "id": "2",
+      "username": "JONATHAN",
+      "password": "jonathan456",
+      "email": "jonathan.quitos@ug.edu.ec",
+      "telefono": "+593962730274",
+      "avatarUrl": null
+    }
+  ]
+}
