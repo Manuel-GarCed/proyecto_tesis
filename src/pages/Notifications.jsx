@@ -72,9 +72,10 @@ export default function NotificationsPage() {
                       <span className="text-gray-800">{r.action}</span>
                       <button
                         onClick={() => setConfirmRecId(r.id)}
-                        className="ml-4 text-sm text-white bg-verde-suave hover:bg-verde-suave-oscuro px-3 py-1 rounded transition"
+                        className="ml-4 text-sm text-white bg-verde-suave cursor-pointer
+                        hover:bg-verde-suave-oscuro px-3 py-1 rounded transition"
                       >
-                        Completada
+                        Completar
                       </button>
                     </div>
                   </li>
@@ -105,13 +106,14 @@ export default function NotificationsPage() {
         <div className="flex justify-end space-x-4">
           <button
             onClick={() => setConfirmRecId(null)}
-            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 transition"
+            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 transition cursor-pointer"
           >
             Cancelar
           </button>
           <button
             onClick={() => completeRec(confirmRecId)}
-            className="px-4 py-2 rounded bg-verde-suave text-white hover:bg-verde-suave-oscuro transition"
+            className="px-4 py-2 rounded bg-verde-suave text-white
+            hover:bg-verde-suave-oscuro transition cursor-pointer"
           >
             Completar
           </button>
