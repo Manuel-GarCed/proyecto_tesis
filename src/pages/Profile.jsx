@@ -79,19 +79,23 @@ export default function Profile() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    // PUT a json-server
+    // Solo enviamos los campos que cambian
+    const payload = {
+      username:  profile.username,
+      email:     profile.email,
+      telefono:  profile.phone,
+      avatarUrl: profile.avatarUrl
+    };
+    if (profile.password) {
+      payload.password = profile.password;
+    }
+
     await fetch(`http://localhost:3001/users/${profile.id}`, {
-      method:  'PUT',
+      method:  'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id:        profile.id,
-        username:  profile.username,
-        password:  profile.password || undefined,
-        email:     profile.email,
-        telefono:  profile.phone,
-        avatarUrl: profile.avatarUrl
-      })
+      body: JSON.stringify(payload)
     });
+    // Marcamos guardado y recargamos
     window.location.reload();
   };
 
@@ -228,7 +232,7 @@ export default function Profile() {
         <button
           type="submit"
           className="bg-cielo-oscuro text-white px-6 py-2 rounded-lg 
-                     hover:bg-cielo transition"
+                     hover:bg-cielo transition cursor-pointer"
         >
           Guardar cambios
         </button>
