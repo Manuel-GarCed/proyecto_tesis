@@ -3,10 +3,9 @@
     {
       "id": "1",
       "username": "MANUEL",
-      "password": "manolo123456",
       "email": "manuel.garciace@ug.edu.ec",
       "telefono": "+593968135960",
-      "avatarUrl": ""
+      "avatarUrl": null
     },
     {
       "id": "2",
