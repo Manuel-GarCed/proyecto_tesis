@@ -1,11 +1,14 @@
 import React from 'react';
 import useSensorData from '../services/useSensorData';
+import useFootprintData from '../services/useFootprintData';
 import TemperatureChart from '../components/TemperatureChart';
 import HumidityChart from '../components/HumidityChart';
 import PhChart from '../components/PhChart';
+import EcologicalFootprintChart from '../components/EcologicalFootprintChart';
 
 export default function Home() {
   const data = useSensorData();
+  const footprintData = useFootprintData();
   console.log("Datos cargados:", data.length, "filas");
 
 console.log(data);
@@ -18,6 +21,8 @@ console.log(data);
         <HumidityChart    data={data} />
         <PhChart          data={data} />
       </div>
+      {/* Gráfico de huella ecológica */}
+      <EcologicalFootprintChart data={footprintData}/>
     </div>
   );
 }
