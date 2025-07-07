@@ -15,19 +15,25 @@ export default function Notifications() {
     initialRecommendations.map(r => ({ ...r, completed: false }))
   );
   const [confirmRecId, setConfirmRecId] = useState(null);
-
-  // 2) ID de rec a resaltar
   const [highlightId, setHighlightId] = useState(null);
 
-  // 3) Al montar o cambiar query ?highlight=...
+  // nuevo estado para fade-out
+  const [fadingOut, setFadingOut] = useState(false)
+
   useEffect(() => {
     const h = new URLSearchParams(location.search).get('highlight');
     if (h) {
       const id = Number(h);
-      setHighlightId(id);               // activa fade-in
-      // tras 1s, quitamos el highlight (fade-out)
-      const t = setTimeout(() => setHighlightId(null), 1000);
-      return () => clearTimeout(t);
+      setHighlightId(id);
+      setFadingOut(false);
+      // tras 1s iniciamos fade-out
+      const t1 = setTimeout(() => setFadingOut(true), 1000);
+      // y tras otros 500ms (la duración de tu transition) quitamos el highlightId
+      const t2 = setTimeout(() => setHighlightId(null), 1500);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
     }
   }, [location.search]);
 
@@ -80,30 +86,39 @@ export default function Notifications() {
             <ul className="space-y-3">
               {pendingRecs.map(r => {
                 const note = initialNotifications.find(n => n.id === r.notificationId);
-                const isHighlighted = r.id === highlightId;
-
+                const isThis = r.id === highlightId;
                 return (
                   <li
-                    className={`
-                      border-l-4 border-verde-suave-oscuro pl-3
-                      transition-opacity duration-500 ease-in-out
-                      ${isHighlighted
-                        ? 'bg-amarillo-concreto bg-opacity-100'
-                        : 'bg-transparent hover:bg-gray-50'
-                      }
-                    `}
+                    key={r.id}
+                    className="relative bg-white border-l-4 border-verde-suave-oscuro pl-3 pr-4 py-2 overflow-hidden"
                   >
-                    <div className="text-sm text-gray-500">
-                      Para: {note?.message}
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-800">{r.action}</span>
+                    {/* overlay de highlight */}
+                    <div
+                      className={`
+                        absolute inset-0 bg-amarillo-concreto my-1 rounded-r-md
+                        transition-opacity duration-500 ease-in-out
+                        ${isThis
+                          ? fadingOut
+                            ? 'opacity-0'
+                            : 'opacity-50'
+                          : 'opacity-0'
+                        }
+                      `}
+                    />
+                    {/* contenido encima */}
+                    <div className="relative z-10 flex items-center justify-between">
+                      <div>
+                        <div className="text-sm text-gray-500">
+                          Para: {note?.message}
+                        </div>
+                        <div className="text-gray-800">{r.action}</div>
+                      </div>
                       <button
                         onClick={() => setConfirmRecId(r.id)}
                         className="
                           ml-4 text-sm text-white bg-verde-suave
                           hover:bg-verde-suave-oscuro px-3 py-1 rounded
-                          transition cursor-pointer
+                          transition
                         "
                       >
                         Completar
