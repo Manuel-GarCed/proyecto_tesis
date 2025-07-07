@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   notifications as initialNotifications,
   recommendations as initialRecommendations
@@ -6,23 +7,39 @@ import {
 import Modal from '../components/Modal';
 import Chatbot from '../components/Chatbot';
 
-export default function NotificationsPage() {
-  // 1) Estado local para recomendaciones
+export default function Notifications() {
+  const location = useLocation();
+
+  // 1) Estado de recomendaciones (añadimos campo completed)
   const [recs, setRecs] = useState(
     initialRecommendations.map(r => ({ ...r, completed: false }))
   );
-  // 2) Qué recomendación estamos confirmando
   const [confirmRecId, setConfirmRecId] = useState(null);
 
-  // 3) Solo las pendientes
+  // 2) ID de rec a resaltar
+  const [highlightId, setHighlightId] = useState(null);
+
+  // 3) Al montar o cambiar query ?highlight=...
+  useEffect(() => {
+    const h = new URLSearchParams(location.search).get('highlight');
+    if (h) {
+      const id = Number(h);
+      setHighlightId(id);               // activa fade-in
+      // tras 1s, quitamos el highlight (fade-out)
+      const t = setTimeout(() => setHighlightId(null), 1000);
+      return () => clearTimeout(t);
+    }
+  }, [location.search]);
+
+  // 4) Filtramos las recs pendientes
   const pendingRecs = recs.filter(r => !r.completed);
 
-  // 4) Notificaciones con al menos una rec pendiente
+  // 5) Qué notificaciones mostrar
   const visibleNotifications = initialNotifications.filter(n =>
     pendingRecs.some(r => r.notificationId === n.id)
   );
 
-  // 5) Marca completada y cierra modal
+  // 6) Marcar completada
   const completeRec = id => {
     setRecs(rs =>
       rs.map(r => (r.id === id ? { ...r, completed: true } : r))
@@ -34,9 +51,8 @@ export default function NotificationsPage() {
     <div className="p-6 space-y-6 relative">
       <h1 className="text-3xl font-bold">Notificaciones y Recomendaciones</h1>
 
-      {/* Grid de 2 columnas */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* --- Notificaciones --- */}
+        {/* Notificaciones */}
         <div className="bg-white p-4 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4">Notificaciones</h2>
           {visibleNotifications.length === 0 ? (
@@ -55,7 +71,7 @@ export default function NotificationsPage() {
           )}
         </div>
 
-        {/* --- Recomendaciones --- */}
+        {/* Recomendaciones */}
         <div className="bg-white p-4 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4">Recomendaciones</h2>
           {pendingRecs.length === 0 ? (
@@ -64,8 +80,19 @@ export default function NotificationsPage() {
             <ul className="space-y-3">
               {pendingRecs.map(r => {
                 const note = initialNotifications.find(n => n.id === r.notificationId);
+                const isHighlighted = r.id === highlightId;
+
                 return (
-                  <li key={r.id} className="border-l-4 border-verde-suave-oscuro pl-3">
+                  <li
+                    className={`
+                      border-l-4 border-verde-suave-oscuro pl-3
+                      transition-opacity duration-500 ease-in-out
+                      ${isHighlighted
+                        ? 'bg-amarillo-concreto bg-opacity-100'
+                        : 'bg-transparent hover:bg-gray-50'
+                      }
+                    `}
+                  >
                     <div className="text-sm text-gray-500">
                       Para: {note?.message}
                     </div>
@@ -73,8 +100,11 @@ export default function NotificationsPage() {
                       <span className="text-gray-800">{r.action}</span>
                       <button
                         onClick={() => setConfirmRecId(r.id)}
-                        className="ml-4 text-sm text-white bg-verde-suave cursor-pointer
-                        hover:bg-verde-suave-oscuro px-3 py-1 rounded transition"
+                        className="
+                          ml-4 text-sm text-white bg-verde-suave
+                          hover:bg-verde-suave-oscuro px-3 py-1 rounded
+                          transition cursor-pointer
+                        "
                       >
                         Completar
                       </button>
@@ -87,12 +117,12 @@ export default function NotificationsPage() {
         </div>
       </div>
 
-      {/* --- Chatbot --- */}
-      <div className="h-96">  {/* altura fija o ajusta a tu gusto */}
+      {/* Chatbot */}
+      <div className="h-96">
         <Chatbot />
       </div>
 
-      {/* --- Modal de confirmación --- */}
+      {/* Modal de confirmación */}
       <Modal
         isOpen={confirmRecId !== null}
         onClose={() => setConfirmRecId(null)}
@@ -106,14 +136,19 @@ export default function NotificationsPage() {
         <div className="flex justify-end space-x-4">
           <button
             onClick={() => setConfirmRecId(null)}
-            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 transition cursor-pointer"
+            className="
+              px-4 py-2 rounded bg-gray-200
+              hover:bg-gray-300 transition cursor-pointer
+            "
           >
             Cancelar
           </button>
           <button
             onClick={() => completeRec(confirmRecId)}
-            className="px-4 py-2 rounded bg-verde-suave text-white
-            hover:bg-verde-suave-oscuro transition cursor-pointer"
+            className="
+              px-4 py-2 rounded bg-verde-suave text-white
+              hover:bg-verde-suave-oscuro transition cursor-pointer
+            "
           >
             Completar
           </button>
