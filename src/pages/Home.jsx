@@ -5,6 +5,7 @@ import TemperatureChart from '../components/TemperatureChart';
 import HumidityChart from '../components/HumidityChart';
 import PhChart from '../components/PhChart';
 import EcologicalFootprintChart from '../components/EcologicalFootprintChart';
+import VariationIndicator           from '../components/VariationIndicator';
 
 export default function Home() {
   const data = useSensorData();
@@ -22,7 +23,10 @@ console.log(data);
         <PhChart          data={data} />
       </div>
       {/* Gráfico de huella ecológica */}
-      <EcologicalFootprintChart data={footprintData}/>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <EcologicalFootprintChart data={footprintData}/>
+        <VariationIndicator      data={footprintData} />
+      </div>
     </div>
   );
 }
