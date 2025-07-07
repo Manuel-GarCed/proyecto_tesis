@@ -51,7 +51,17 @@ export default function EcologicalFootprintChart({ data }) {
           />
           <YAxis
             domain={[48.60, 48.82]}
-            label={{ value: 'm²', angle: -90, position: 'insideLeft' }}
+            tickFormatter={value => value.toFixed(2)}
+            label={{
+                value: 'm²',
+                angle: -90,
+                position: 'insideLeft',
+                style: {
+                fontWeight: 'bold',
+                fontSize: '20px',
+                fill: '#333'
+                }
+            }}
           />
           <Tooltip 
             formatter={value => value.toFixed(6) + ' m²'} 
