@@ -7,10 +7,11 @@ export default function Chatbot() {
   const scrollRef = useRef(null);
 
   // Hace scroll automático al final de la conversación
+  /*
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-
+  */
   const handleSend = async () => {
     const text = input.trim();
     if (!text) return;

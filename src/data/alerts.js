@@ -49,5 +49,40 @@ export const recommendations = [
     notificationId: 3,
     action: 'Programar abonado de 5gr',
   },
+    {
+    id: 5,
+    notificationId: 4,
+    action: 'recon 1 blablabla blñe ble lbel lbe blablabla blñe ble lbe',
+  },
+  {
+    id: 6,
+    notificationId: 2,
+    action: 'Programar aromaticazoipj ligera',
+  },
+    {
+    id: 7,
+    notificationId: 3,
+    action: 'Excrementar los exrementos',
+  },
+  {
+    id: 8,
+    notificationId: 4,
+    action: 'recon 1 blablabla blñe ble lbel',
+  },
+    {
+    id: 9,
+    notificationId: 2,
+    action: 'Programar aromaticazoipj ligera',
+  },
+    {
+    id: 10,
+    notificationId: 3,
+    action: 'Excrementar los exrementos',
+  },
+  {
+    id: 11,
+    notificationId: 4,
+    action: 'recon 1 blablabla blñe ble lbel',
+  },
   // …
 ];

@@ -26,6 +26,18 @@ export default function Notifications() {
       const id = Number(h);
       setHighlightId(id);
       setFadingOut(false);
+
+      // Scroll al elemento tras un tick (espera a que el DOM pinte)
+      setTimeout(() => {
+        const el = document.getElementById(`rec-${id}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          // si no existe, vamos arriba
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 50);
+
       // tras 1s iniciamos fade-out
       const t1 = setTimeout(() => setFadingOut(true), 1000);
       // y tras otros 500ms (la duración de tu transition) quitamos el highlightId
@@ -66,7 +78,7 @@ export default function Notifications() {
           ) : (
             <ul className="space-y-3">
               {visibleNotifications.map(n => (
-                <li key={n.id} className="border-l-4 border-red-400 pl-3">
+                <li key={n.id} className="border-l-4 border-red-400 pl-3 hover:bg-gray-50">
                   <div className="text-sm text-gray-500">
                     {new Date(n.timestamp).toLocaleString()}
                   </div>
@@ -90,17 +102,18 @@ export default function Notifications() {
                 return (
                   <li
                     key={r.id}
-                    className="relative bg-white border-l-4 border-verde-suave-oscuro pl-3 pr-4 py-2 overflow-hidden"
+                    className="relative bg-white border-l-4 border-verde-suave-oscuro pl-3 
+                              pr-4 overflow-hidden hover:bg-gray-50"
                   >
                     {/* overlay de highlight */}
                     <div
                       className={`
-                        absolute inset-0 bg-amarillo-concreto my-1 rounded-r-md
+                        absolute inset-0 bg-amarillo-concreto rounded-r-md
                         transition-opacity duration-500 ease-in-out
                         ${isThis
                           ? fadingOut
                             ? 'opacity-0'
-                            : 'opacity-50'
+                            : 'opacity-40'
                           : 'opacity-0'
                         }
                       `}

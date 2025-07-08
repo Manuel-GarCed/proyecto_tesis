@@ -27,7 +27,7 @@ export default function Home() {
 //console.log(data);
   
   // Elegimos solo las primeras 3 (o cualquier lógica tuya)
-  const top3 = recommendations.slice(0, 3)
+  const top3 = recommendations.slice(0, 11)
 
 
   // suponemos que data está ordenado cronológicamente ascendente
@@ -37,46 +37,58 @@ export default function Home() {
   const cards = [
     {
       icon: FaTint,
-      label: 'Humedad',
+      label: 'Humedad actual',
       value: last.humedad?.toFixed(1),
       unit: '%',
       trend: last.humedad - prev.humedad,
       trendUnit: '%',
-      trendText: 'vs 1 lectura antes'
+      trendText: 'vs última lectura'
     },
     {
       icon: FaThermometerHalf,
-      label: 'Temperatura',
+      label: 'Temperatura actual',
       value: last.temperatura?.toFixed(1),
       unit: '°C',
       trend: last.temperatura - prev.temperatura,
       trendUnit: '°C',
-      trendText: 'vs 1 lectura antes'
+      trendText: 'vs última lectura'
     },
     {
       icon: FaFlask,
-      label: 'pH',
+      label: 'pH actual',
       value: last.pH?.toFixed(2),
       unit: '',
       trend: last.pH - prev.pH,
       trendUnit: '',
-      trendText: 'vs 1 lectura antes'
+      trendText: 'vs última lectura'
     },
   ];
 
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">Hola, aquí tu informe general</h1>
+      <h1 className="text-3xl font-bold">Hola, aquí tu informe básico 😊</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {cards.map((c, i) => (
           <IndicatorCard key={i} {...c} />
         ))}
       </div>
-      {/* Gráfico de huella ecológica */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-        <EcologicalFootprintChart data={footprintData}/>
-        <VariationIndicator      data={footprintData} />
+      {/* Gráfico de huella ecológicaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Izquierda: ocupa su contenido */}
+        <div className="h-[460px]">
+          <EcologicalFootprintChart data={footprintData} />
+        </div>
+
+        {/* Derecha: column flex para indicator arriba y rec rápidas abajo */}
+        {/* Derecha: indicator + recs */}
+        <div className="h-[460px] flex flex-col">
+          <VariationIndicator data={footprintData} />
+          {/* Este wrapper sólo flex para que el hijo ocupe el hueco */}
+          <div className="mt-6 flex-1 flex flex-col min-h-0">
+            <RecommendationsSummary recommendations={top3} />
+          </div>
+        </div>
       </div>
       {/* Gráficos diarios de serie */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -84,7 +96,7 @@ export default function Home() {
         <DailyTemperatureChart data={data}/>
         <DailyPhChart          data={data}/>
       </div>
-      <RecommendationsSummary recommendations={top3} />
+      
     </div>
   );
 }
