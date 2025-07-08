@@ -12,7 +12,9 @@ import Dashboard from './pages/Dashboard'
 import Notifications from './pages/Notifications'
 import Detection from './pages/Detection'
 import Profile from './pages/Profile'
+import RegistroDiario from './pages/RegistroDiario.jsx'
 import Login from './pages/Login'
+
 
 export default function App() {
   const location = useLocation();
@@ -71,6 +73,7 @@ export default function App() {
               <Route path="/dashboard"     element={<Dashboard />} />
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/detection"     element={<Detection />} />
+              <Route path="/registro"      element={<RegistroDiario />} />
               <Route path="/profile"       element={<Profile />} />
             </Route>
 

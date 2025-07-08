@@ -1,12 +1,14 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { FaHome, FaChartBar, FaBell, FaMicroscope, FaUser, FaBars, FaChevronLeft } from 'react-icons/fa';
+import { FaPenToSquare } from 'react-icons/fa6';
 
 const routes = [
   { path: '/home',          name: 'Inicio',        icon: FaHome       },
   { path: '/dashboard',     name: 'Dashboard',     icon: FaChartBar   },
   { path: '/notifications', name: 'Notificaciones',icon: FaBell       },
   { path: '/detection',     name: 'Detección',     icon: FaMicroscope },
+  { path: '/registro',      name: 'Registro',      icon: FaPenToSquare},
   { path: '/profile',       name: 'Perfil',        icon: FaUser       },
 ];
 
