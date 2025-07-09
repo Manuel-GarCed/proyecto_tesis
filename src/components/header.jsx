@@ -12,6 +12,7 @@ export default function Header() {
     '/notifications': 'Notificaciones',
     '/detection':     'Detección',
     '/profile':       'Perfil',
+    '/registro':      'Registro de cuidado del huerto',
   };
 
   // Calcula título según la ruta actual, con fallback
