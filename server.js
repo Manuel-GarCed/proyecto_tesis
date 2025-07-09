@@ -1,74 +1,70 @@
-import express from 'express';
-import { existsSync, mkdirSync, createReadStream, appendFileSync } from 'fs';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';         // <— importamos fileURLToPath
-import csvParser from 'csv-parser';
-import { stringify } from 'csv-stringify/sync';
-import cors from 'cors';
+import express, { json } from 'express'
+import { existsSync, createReadStream, appendFileSync } from 'fs'
+import { join } from 'path'
+import csvParser from 'csv-parser'
+import { stringify } from 'csv-stringify/sync'
+import cors from 'cors'
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+const app = express()
+app.use(cors())
+app.use(json())
 
-// Reconstruimos __dirname en ESM
-const __filename = fileURLToPath(import.meta.url);
-const __dirname  = dirname(__filename);
+// Ahora sí _join_ usará __dirname si renombramos este archivo a server.cjs,
+// o bien obtenlo a mano:
+// const __dirname = new URL('.', import.meta.url).pathname
+const CSV_FILE = join(process.cwd(), 'src', 'data', 'daily_records.csv')
 
-const dataDir = join(__dirname, 'data');
-if (!existsSync(dataDir)) {
-  mkdirSync(dataDir, { recursive: true });
-}
-const CSV_FILE = join(dataDir, 'daily_records.csv');
-
-
-// GET /api/records → devuelve JSON con todos los registros
 app.get('/api/records', (req, res) => {
-  const rows = [];
-  if (!existsSync(CSV_FILE)) return res.json(rows);
+  const rows = []
+  if (!existsSync(CSV_FILE)) return res.json(rows)
+
+  // Sin pasar `headers` ni `skipLines`: por defecto
+  // csv-parser usa la 1ª línea como cabecera y la salta.
   createReadStream(CSV_FILE)
-    .pipe(csvParser({ headers: ['id','date','water','fertilizer','waste'] }))
-    .on('data', row => {
+    .pipe(csvParser())
+    .on('data', r => {
       rows.push({
-        id:         Number(row.id),
-        date:       row.date,
-        water:      Number(row.water),
-        fertilizer: Number(row.fertilizer),
-        waste:      Number(row.waste),
-      });
+        id:         Number(r.id),
+        date:       r.date,
+        water:      Number(r.water),
+        fertilizer: Number(r.fertilizer),
+        waste:      Number(r.waste),
+      })
     })
-    .on('end', () => res.json(rows));
-});
+    .on('end', () => res.json(rows))
+})
 
-// POST /api/records → añade un registro al CSV y lo devuelve
 app.post('/api/records', (req, res) => {
-  const { date, water, fertilizer, waste } = req.body;
-  let all = [];
+  const { date, water, fertilizer, waste } = req.body
+  let all = []
 
-  // Leemos para obtener el último ID
+  function write() {
+    const lastId = all.length
+      ? Math.max(...all.map(r => Number(r.id)))
+      : 0
+    const nextId = lastId + 1
+    const row    = { id: nextId, date, water, fertilizer, waste }
+    // stringify añade correctamente la cabecera sólo si header=true
+    const csv = stringify([row], {
+      header: all.length === 0,
+      columns: ['id','date','water','fertilizer','waste'],
+      record_delimiter: '\n'
+    })
+    appendFileSync(CSV_FILE, csv)
+    res.json(row)
+  }
+
   if (existsSync(CSV_FILE)) {
     createReadStream(CSV_FILE)
-      .pipe(csvParser({ headers: ['id','date','water','fertilizer','waste'] }))
+      .pipe(csvParser())
       .on('data', r => all.push(r))
-      .on('end', writeRecord);
+      .on('end', write)
   } else {
-    writeRecord();
+    write()
   }
+})
 
-  function writeRecord() {
-    const lastId = all.length ? Math.max(...all.map(r => Number(r.id))) : 0;
-    const nextId = lastId + 1;
-    const row    = { id: nextId, date, water, fertilizer, waste };
-    // Si no existe el CSV, incluimos cabecera
-    const csv = stringify([row], {
-      header:  all.length === 0,
-      columns: ['id','date','water','fertilizer','waste']
-    });
-    appendFileSync(CSV_FILE, csv);
-    res.json(row);
-  }
-});
-
-const port = process.env.PORT || 4000;
-app.listen(port, () => {
-  console.log(`Server listening on http://localhost:${port}`);
-});
+const port = process.env.PORT || 4000
+app.listen(port, () =>
+  console.log(`Server escuchando en http://localhost:${port}`)
+)
