@@ -203,7 +203,7 @@ export default function RegistroDiario() {
               {['ID','Fecha','Agua (L)','Fertilizantes (g)','Residuos (kg)','Energía (MWh)','Acciones'].map(h => (
                 <th
                   key={h}
-                  className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase"
+                  className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase hover:bg-gray-100"
                 >
                   {h}
                 </th>
@@ -212,7 +212,7 @@ export default function RegistroDiario() {
           </thead>
           <tbody className="divide-y divide-gray-100 text-center">
             {records.map(r => (
-              <tr key={r.id}>
+              <tr key={r.id} className='hover:bg-gray-100'>
                 <td className="px-4 py-2 text-sm">{r.id}</td>
                 <td className="px-4 py-2 text-sm">{r.date}</td>
                 <td className="px-4 py-2 text-sm">{r.water}</td>
@@ -231,7 +231,7 @@ export default function RegistroDiario() {
                   <button
                     onClick={() => openDelete(r.id)}
                     className="text-sm text-white bg-red-600
-                          hover:bg-red-400 px-3 py-1 rounded
+                          hover:bg-red-700 px-3 py-1 rounded
                           transition cursor-pointer"
                   >
                     Eliminar
