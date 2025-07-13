@@ -50,7 +50,7 @@ export default function EcologicalFootprintChart({ data }) {
             tick={{ fontSize: 14 }}
           />
           <YAxis
-            domain={[48.60, 48.82]}
+            domain={[30, 50]}
             tickFormatter={value => value.toFixed(2)}
             label={{
                 value: 'm²',

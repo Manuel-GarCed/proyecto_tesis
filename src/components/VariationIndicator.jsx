@@ -30,7 +30,7 @@ export default function VariationIndicator({ data }) {
         </span>
       </div>
       <div className="mt-2 text-gray-700">
-        {isIncrease ? 'Incremento' : 'Decremento'} vs Antes
+        {isIncrease ? 'Incremento' : 'Reducción'} de huella ecológica comparado con Antes
       </div>
     </div>
   );

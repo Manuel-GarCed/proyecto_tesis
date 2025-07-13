@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../components/Modal';
+import useWaterPrediction from '../services/useWaterPrediction';
+import RegressionChart from '../components/RegressionChart';
+
 import {
   fetchRecords,
   createRecord,
@@ -8,6 +11,8 @@ import {
 } from '../services/dailyRecordService';
 
 export default function RegistroDiario() {
+  const [predModalRec, setPredModalRec] = useState(null);
+  const waterPrediction = useWaterPrediction();  // ← aquí tenemos la predicción
   const [records, setRecords] = useState([]);
   const [form, setForm]       = useState({
     date: new Date().toISOString().slice(0, 10),
@@ -72,29 +77,85 @@ export default function RegistroDiario() {
     setError('');
   };
 
+  // 3) Rellenar con predicción **Y** actualizar el array local
+  function fillWaterWithPrediction(event) {
+    event.preventDefault();           // por si acaso
+    if (waterPrediction == null) {
+      setError('Necesitas al menos 2 registros para predecir');
+      return;
+    }
+    const predValue = Number(waterPrediction.toFixed(2));
+ 
+    // 3a) Actualiza sólo el editRec (input del modal)
+    setEditRec(er => ({
+      ...er,
+      water: predValue,
+      predicted: true
+    }));
+ 
+    // 3b) Y actualiza tu tabla en pantalla
+    setRecords(rs =>
+      rs.map(r =>
+        r.id === editRec.id
+          ? { ...r, water: predValue, predicted: true }
+          : r
+      )
+    );
+  }  
+
   // 5) Confirmar edición
-  const handleUpdate = async () => {
-  const { water, fertilizer, waste , energy} = editRec;
+const handleUpdate = async () => {
+  // 1) Extraemos también el campo `predicted` de editRec
+  const { water, fertilizer, waste, energy, predicted } = editRec;
+
+  // 2) Validación de campos obligatorios / valores negativos
+  if (
+    water === '' || fertilizer === '' ||
+    waste === '' || energy === ''
+  ) {
+    setError('Todos los campos son obligatorios');
+    return;
+  }
   if (water < 0 || fertilizer < 0 || waste < 0 || energy < 0) {
     setError('Datos ingresados inválidos');
     return;
   }
-    setConfirmLoading(true);
-    try {
-      const upd = await updateRecord(editRec.id, {
-        water: Number(editRec.water),
-        fertilizer: Number(editRec.fertilizer),
-        waste: Number(editRec.waste),
-        energy: Number(editRec.energy)
-      });
-      setRecords(rs => rs.map(r => (r.id === upd.id ? upd : r)));
-      setEditRec(null);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setConfirmLoading(false);
-    }
-  };
+
+  setError('');
+  setConfirmLoading(true);
+
+  try {
+    // 3) Llamamos al API para actualizar
+    const upd = await updateRecord(editRec.id, {
+      water:      Number(water),
+      fertilizer: Number(fertilizer),
+      waste:      Number(waste),
+      energy:     Number(energy)
+    });
+
+    // 4) Armamos el objeto final incluyendo el flag `predicted`
+    const updatedRecord = {
+      ...upd,
+      predicted: predicted === true
+    };
+
+    // 5) Reemplazamos en el estado
+    setRecords(rs =>
+      rs.map(r => (r.id === updatedRecord.id ? updatedRecord : r))
+    );
+
+    // 6) Cerramos modal y limpiamos editRec
+    setEditRec(null);
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setConfirmLoading(false);
+  }
+};
+
+
+ // 5b) función para rellenar con la predicción
+
 
   // 6) Abrir modal eliminar
   const openDelete = id => setDelRecId(id);
@@ -215,7 +276,14 @@ export default function RegistroDiario() {
               <tr key={r.id} className='hover:bg-gray-100'>
                 <td className="px-4 py-2 text-sm">{r.id}</td>
                 <td className="px-4 py-2 text-sm">{r.date}</td>
-                <td className="px-4 py-2 text-sm">{r.water}</td>
+                <td
+                  className={`px-4 py-2 text-sm ${r.predicted ? 'text-green-600 font-semibold cursor-pointer' : ''}`}
+                  onClick={() => {
+                    if (r.predicted) setPredModalRec(r);
+                  }}
+                >
+                  {r.water}
+                </td>
                 <td className="px-4 py-2 text-sm">{r.fertilizer}</td>
                 <td className="px-4 py-2 text-sm">{r.waste}</td>
                 <td className="px-4 py-2 text-sm">{r.energy}</td>
@@ -257,26 +325,61 @@ export default function RegistroDiario() {
         </h3>
         {editRec && (
           <div className="space-y-4">
-            {['water','fertilizer','waste','energy'].map(field => (
-              <div key={field}>
-                <label className="block text-sm">
-                  {field === 'energy' ? 'Energía (MWh)'
-                  : field === 'water' ? 'Agua (L)'
-                  : field === 'fertilizer' ? 'Fertilizantes (g)'
-                  : 'Residuos (kg)'}
-                </label>
-                <input
-                  type="number"
-                  step="any"
-                  value={editRec[field]}
-                  onChange={e =>
-                    setEditRec(er => ({ ...er, [field]: e.target.value }))
-                  }
-                  className="mt-1 w-full border rounded px-2 py-1"
-                />
-              </div>
-            ))}
+            {/* Recorremos cada campo, pero tratamos "water" especial */}
+            {['water','fertilizer','waste','energy'].map((field) => {
+              // Etiqueta según campo
+              let label;
+              if (field === 'energy') label = 'Energía (MWh)';
+              else if (field === 'water') label = 'Agua (L)';
+              else if (field === 'fertilizer') label = 'Fertilizantes (g)';
+              else label = 'Residuos (kg)';
+
+              // Si es water, mostramos input + botón de predecir
+              if (field === 'water') {
+                return (
+                  <div key={field}>
+                    <label className="block text-sm">{label}</label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="number"
+                        step="any"
+                        value={editRec.water}
+                        onChange={e =>
+                          setEditRec(er => ({ ...er, water: e.target.value }))
+                        }
+                        className="mt-1 flex-1 border rounded px-2 py-1"
+                      />
+                      <button
+                        type="button"
+                        onClick={fillWaterWithPrediction}
+                        className="mt-1 px-3 py-1 text-sm bg-cielo-oscuro text-white rounded hover:bg-cielo transition"
+                      >
+                        ¿No conoces? Predecir
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Para los demás campos solo el input
+              return (
+                <div key={field}>
+                  <label className="block text-sm">{label}</label>
+                  <input
+                    type="number"
+                    step="any"
+                    value={editRec[field]}
+                    onChange={e =>
+                      setEditRec(er => ({ ...er, [field]: e.target.value }))
+                    }
+                    className="mt-1 w-full border rounded px-2 py-1"
+                  />
+                </div>
+              );
+            })}
+
             {error && <p className="text-red-500">{error}</p>}
+
             <div className="flex justify-end space-x-2">
               <button
                 onClick={() => setEditRec(null)}
@@ -287,8 +390,7 @@ export default function RegistroDiario() {
               <button
                 onClick={handleUpdate}
                 disabled={confirmLoading}
-                className="px-4 py-2 bg-cielo-oscuro text-white rounded
-                        hover:bg-cielo cursor-pointer"
+                className="px-4 py-2 bg-cielo-oscuro text-white rounded hover:bg-cielo cursor-pointer"
               >
                 {confirmLoading ? 'Guardando...' : 'Guardar cambios'}
               </button>
@@ -318,6 +420,22 @@ export default function RegistroDiario() {
           </button>
         </div>
       </Modal>
+
+      {predModalRec && (
+        <Modal
+          isOpen={!!predModalRec}
+          onClose={() => setPredModalRec(null)}
+        >
+          <h3 className="text-lg font-semibold mb-4">
+            Regresión lineal y predicción de Agua (L)
+          </h3>
+          <RegressionChart
+            record={predModalRec}
+            allRecords={records}
+          />
+        </Modal>
+      )}
+      
     </div>
   );
 }
