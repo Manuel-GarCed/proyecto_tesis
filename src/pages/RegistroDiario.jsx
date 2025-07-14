@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Modal from '../components/Modal';
 import useWaterPrediction from '../services/useWaterPrediction';
 import RegressionChart from '../components/RegressionChart';
+import useDailyHumidity from '../services/useDailyHumidity'
+
+import { useMemo } from 'react'
 
 import {
   fetchRecords,
@@ -11,7 +14,8 @@ import {
 } from '../services/dailyRecordService';
 
 export default function RegistroDiario() {
-  const [predModalRec, setPredModalRec] = useState(null);
+  const dailyHumidity = useDailyHumidity()
+  const [predModalRec, setPredModalRec] = useState(null)
   const waterPrediction = useWaterPrediction();  // ← aquí tenemos la predicción
   const [records, setRecords] = useState([]);
   const [form, setForm]       = useState({
@@ -101,7 +105,8 @@ export default function RegistroDiario() {
           : r
       )
     );
-  }  
+  }
+
 
   // 5) Confirmar edición
 const handleUpdate = async () => {
@@ -422,17 +427,15 @@ const handleUpdate = async () => {
       </Modal>
 
       {predModalRec && (
-        <Modal
-          isOpen={!!predModalRec}
-          onClose={() => setPredModalRec(null)}
-        >
-          <h3 className="text-lg font-semibold mb-4">
-            Regresión lineal y predicción de Agua (L)
-          </h3>
-          <RegressionChart
-            record={predModalRec}
-            allRecords={records}
-          />
+        <Modal isOpen onClose={() => setPredModalRec(null)}>
+          <h3>Regresión Humedad → Consumo de Agua</h3>
+          <div className="modal-chart">
+            <RegressionChart
+              allRecords={records}
+              dailyHumidity={dailyHumidity}
+              predictedRecord={predModalRec}
+            />
+          </div>
         </Modal>
       )}
       

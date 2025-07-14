@@ -147,6 +147,7 @@ export default function Notifications() {
 
       {/* Chatbot */}
       <div className="h-96">
+        <h2 className="text-xl font-semibold mb-4">¿Tienes dudas? Pregúntame 👇</h2>
         <Chatbot />
       </div>
 

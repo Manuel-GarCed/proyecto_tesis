@@ -27,7 +27,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
         {/* Solo mostramos el logo + texto cuando la sidebar está abierta */}
         {isOpen && (
           <span className="text-xl font-semibold text-fondo-hueso">
-            🌿 Tesis Huerto
+            🌿 EcoGarden
           </span>
         )}
         <button

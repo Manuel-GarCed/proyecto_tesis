@@ -1,108 +1,136 @@
-import React, { useMemo } from 'react';
+import React, { useMemo } from 'react'
 import {
   ResponsiveContainer,
-  LineChart,
+  ComposedChart,
+  Scatter,
   Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip
-} from 'recharts';
+} from 'recharts'
 
-export default function RegressionChart({ record, allRecords }) {
-  // 1) Ordenamos por fecha ascendente
-  const sorted = useMemo(() =>
-    [...allRecords].sort(
-      (a, b) => new Date(a.date) - new Date(b.date)
-    ),
-    [allRecords]
-  );
+export default function RegressionChart({
+  allRecords,
+  dailyHumidity,
+  predictedRecord
+}) {
+  // 1) Agrupamos allRecords para obtener agua total por día
+  const dailyWater = useMemo(() => {
+    const map = {}
+    allRecords.forEach(r => {
+      map[r.date] = (map[r.date] || 0) + Number(r.water)
+    })
+    return Object.entries(map).map(([date, water]) => ({ date, water }))
+  }, [allRecords])
 
-  // 2) Creamos vectores x (0,1,2,...), y (agua)
-  const n = sorted.length;
-  const xs = sorted.map((r,i) => i);
-  const ys = sorted.map(r => r.water);
+  // 2) Fusionamos por fecha: coincidencias en humidity y water
+  const scatterData = useMemo(() => {
+    // mapa fecha → humedad
+    const humMap = Object.fromEntries(
+      dailyHumidity.map(h => [h.date, h.humidity])
+    )
 
-  // 3) Calculamos media, pendiente e intercepto
-  const meanX = xs.reduce((s,v) => s+v, 0) / n;
-  const meanY = ys.reduce((s,v) => s+v, 0) / n;
-  const num = xs.reduce((s,x,i) => s + (x - meanX)*(ys[i] - meanY), 0);
-  const den = xs.reduce((s,x) => s + (x - meanX)**2, 0);
-  const slope = den === 0 ? 0 : num/den;
-  const intercept = meanY - slope*meanX;
+    // sólo fechas con ambos valores
+    const pts = dailyWater
+      .map(w => {
+        const h = humMap[w.date]
+        return h != null
+          ? { x: h, y: w.water, date: w.date }
+          : null
+      })
+      .filter(p => p)
 
-  // 4) Predicción para el siguiente día (índice n)
-  const predictedY = intercept + slope * n;
-  // fecha siguiente
-  const nextDate = (() => {
-    const d = new Date(sorted[n-1].date);
-    d.setDate(d.getDate() + 1);
-    return d.toISOString().slice(0,10);
-  })();
+    // SI además tienes un predictedRecord explícito,
+    // lo insertamos o reemplazamos su fecha
+    if (predictedRecord) {
+      const idx = pts.findIndex(p => p.date === predictedRecord.date)
+      const point = {
+        x: humMap[predictedRecord.date] ?? pts[pts.length - 1]?.x,
+        y: Number(predictedRecord.water),
+        date: predictedRecord.date,
+        predicted: true
+      }
+      if (idx >= 0) pts[idx] = point
+      else pts.push(point)
+    }
 
-  // 5) Datos para el gráfico: puntos reales + punto predicho
-  const data = sorted.map((r,i) => ({
-    index: i,
-    date: r.date,
-    water: r.water
-  })).concat({
-    index: n,
-    date: nextDate,
-    water: predictedY
-  });
+    return pts
+  }, [dailyWater, dailyHumidity, predictedRecord])
+
+  if (!scatterData.length) {
+    return (
+      <div className="p-4 text-center text-gray-500">
+        No hay datos de humedad + agua para trazar…
+      </div>
+    )
+  }
+
+  // 3) Calculamos regresión lineal sobre scatterData
+  const n     = scatterData.length
+  const sumX  = scatterData.reduce((s, p) => s + p.x, 0)
+  const sumY  = scatterData.reduce((s, p) => s + p.y, 0)
+  const sumXY = scatterData.reduce((s, p) => s + p.x * p.y, 0)
+  const sumXX = scatterData.reduce((s, p) => s + p.x * p.x, 0)
+  const m     = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX)
+  const b     = (sumY - m * sumX) / n
+
+  // 4) Definimos la línea usando mínimo y máximo de X
+  const xs = scatterData.map(p => p.x).sort((a,z) => a - z)
+  const lineData = [
+    { x: xs[0],            y: m * xs[0]            + b },
+    { x: xs[xs.length-1],  y: m * xs[xs.length-1]  + b }
+  ]
 
   return (
-    <div style={{ width: '100%', height: 300 }}>
-      <ResponsiveContainer>
-        <LineChart data={data} margin={{ top: 20, right: 20, left: 10, bottom: 30 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="date"
-            angle={-45}
-            textAnchor="end"
-            height={40}
-          />
-          <YAxis
-            label={{ value: 'Agua (L)', angle: -90, position: 'insideLeft' }}
-          />
-          <Tooltip
-            labelFormatter={d => `Fecha: ${d}`}
-            formatter={v => v.toFixed(2) + ' L'}
-          />
-          <Line
-            type="monotone"
-            dataKey="water"
-            stroke="#8884d8"
-            dot={props => {
-              const { payload, cx, cy } = props;
-              // si es el último punto (predicho), dibujamos en verde y más grande
-              if (payload.index === n) {
-                return (
-                  <circle
-                    cx={cx}
-                    cy={cy}
-                    r={6}
-                    fill="green"
-                    stroke="white"
-                    strokeWidth={2}
-                  />
-                );
-              }
-              // puntos reales
-              return (
-                <circle
-                  cx={cx}
-                  cy={cy}
-                  r={3}
-                  fill="#8884d8"
-                />
-              );
-            }}
-            strokeDasharray="5 5"
-            strokeWidth={2}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
-  );
+    <ResponsiveContainer width="100%" height={300}>
+      <ComposedChart
+        data={scatterData}
+        margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+
+        <XAxis
+          dataKey="x"
+          name="Humedad diaria"
+          unit="%"
+          type="number"
+          domain={['dataMin', 'dataMax']}
+          tickFormatter={v => `${v.toFixed(0)}%`}
+        />
+
+        <YAxis
+          dataKey="y"
+          name="Agua consumida"
+          unit="L"
+          type="number"
+          domain={['dataMin'*0.8, 'dataMax'*1.2]}
+          tickFormatter={v => v.toFixed(0)}
+        />
+
+        <Tooltip
+          labelFormatter={dateX => `Humedad: ${dateX.toFixed(2)}%`}
+          formatter={(value, name) => [`${value.toFixed(2)} L`, name]}
+        />
+
+        {/* puntos reales */}
+        <Scatter
+          name="Datos reales"
+          data={scatterData}
+          fill="#489fb5"
+          shape="circle"
+        />
+
+        {/* recta de regresión */}
+        <Line
+          type="linear"
+          name="Regresión"
+          data={lineData}
+          dataKey="y"
+          stroke="#ffa62b"
+          dot={false}
+        />
+      </ComposedChart>
+    </ResponsiveContainer>
+  )
 }

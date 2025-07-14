@@ -4,85 +4,58 @@ export const notifications = [
     id: 1,
     timestamp: '2025-07-02T09:15:00Z',
     type: 'temperatura',
-    message: 'La temperatura superó los 30 °C',
+    message: 'La temperatura superó los 35 °C, nivel crítico para los cultivos.',
   },
   {
     id: 2,
     timestamp: '2025-07-02T11:40:00Z',
     type: 'humedad',
-    message: 'Humedad por debajo del 40 %',
+    message: 'La humedad descendió por debajo del límite mínimo recomendado (menor al 60 %).',
   },
-    {
+  {
     id: 3,
     timestamp: '2025-07-02T15:15:00Z',
     type: 'ph',
-    message: 'ph en niveles menores a 6',
+    message: 'El pH se encuentra en niveles demasiado ácidos (menor a 5.5).',
   },
   {
     id: 4,
     timestamp: '2025-07-02T16:40:00Z',
-    type: 'humedad',
-    message: 'Humedad por debajo del 25 %',
+    type: 'temperatura',
+    message: 'La temperatura descendió por debajo del rango ideal (menor a 25 °C).',
   },
-  // …
+  {
+    id: 5,
+    timestamp: '2025-07-02T17:50:00Z',
+    type: 'humedad',
+    message: 'La humedad superó el límite máximo recomendado (más del 80 %). Riesgo de hongos.',
+  },
 ];
 
-// Recomendaciones asociadas
 export const recommendations = [
   {
     id: 1,
     notificationId: 1,
-    action: 'Incrementar el riego en 10 min cada 2 horas',
+    action: 'Aumentar frecuencia de riego con sesiones breves (10 minutos cada 2 horas) para reducir estrés térmico en las plantas.',
   },
   {
     id: 2,
     notificationId: 2,
-    action: 'Programar nebulización ligera',
+    action: 'Activar el sistema de nebulización ligera hasta alcanzar niveles ideales de humedad (60-80 %).',
   },
-    {
+  {
     id: 3,
     notificationId: 3,
-    action: 'Incrementar el riego en 10 min cada 5 horas',
+    action: 'Aplicar cal agrícola al suelo (aprox. 10 gramos por m²) para neutralizar la acidez y elevar el pH al rango ideal.',
   },
   {
     id: 4,
-    notificationId: 3,
-    action: 'Programar abonado de 5gr',
+    notificationId: 4,
+    action: 'Utilizar cobertura vegetal o mantas térmicas para mantener la temperatura del suelo por encima de 25 °C.',
   },
-    {
+  {
     id: 5,
-    notificationId: 4,
-    action: 'recon 1 blablabla blñe ble lbel lbe blablabla blñe ble lbe',
+    notificationId: 5,
+    action: 'Reducir el riego temporalmente y mejorar ventilación del área para disminuir la humedad y prevenir la aparición de enfermedades fúngicas.',
   },
-  {
-    id: 6,
-    notificationId: 2,
-    action: 'Programar aromaticazoipj ligera',
-  },
-    {
-    id: 7,
-    notificationId: 3,
-    action: 'Excrementar los exrementos',
-  },
-  {
-    id: 8,
-    notificationId: 4,
-    action: 'recon 1 blablabla blñe ble lbel',
-  },
-    {
-    id: 9,
-    notificationId: 2,
-    action: 'Programar aromaticazoipj ligera',
-  },
-    {
-    id: 10,
-    notificationId: 3,
-    action: 'Excrementar los exrementos',
-  },
-  {
-    id: 11,
-    notificationId: 4,
-    action: 'recon 1 blablabla blñe ble lbel',
-  },
-  // …
 ];
