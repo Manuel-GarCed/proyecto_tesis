@@ -14,6 +14,7 @@ import Detection from './pages/Detection'
 import Profile from './pages/Profile'
 import RegistroDiario from './pages/RegistroDiario.jsx'
 import Login from './pages/Login'
+import ImagenClassifier from './pages/ImagenClassifier'
 
 
 export default function App() {

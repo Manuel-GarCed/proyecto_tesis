@@ -117,3 +117,21 @@
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+
+.page-container {
+  text-align: center;
+  padding: 2rem;
+}
+
+canvas {
+  border: 2px solid #444;
+  margin-top: 1rem;
+  max-width: 100%;
+}
+
+.prediction-text {
+  margin-top: 1rem;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #0c640c;
+}
