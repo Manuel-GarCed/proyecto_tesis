@@ -101,7 +101,7 @@ export default function DailyHumidityChart({ data = [] }) {
             dataKey="humedad"
             stroke="#489FB5"
             strokeWidth={2}
-            dot={true}
+            dot={false}
             activeDot={{ r: 4 }}
           />
         </LineChart>

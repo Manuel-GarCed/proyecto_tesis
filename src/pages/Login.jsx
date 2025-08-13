@@ -158,14 +158,14 @@ const Login = () => {
               <h4 className="font-bold text-color-cielo-oscuro mb-3">Requisitos de acceso:</h4>
               <ul className="list-disc pl-5 space-y-1 text-gray-700">
                 <li>
-                  Solo los usuarios <span className="font-bold text-cielo-oscuro">MANUEL</span> y{' '}
-                  <span className="font-bold text-cielo-oscuro">JONATHAN</span> pueden ingresar
+                  Solo los usuarios con <span className="font-bold text-cielo-oscuro">USUARIO</span> y{' '}
+                  <span className="font-bold text-cielo-oscuro">CONTRASEÑA</span> pueden ingresar
                 </li>
                 <li>
                   El nombre de usuario debe estar en{' '}
                   <span className="font-bold text-cielo-oscuro">MAYÚSCULAS</span>
                 </li>
-                <li>Cualquier contraseña es válida para estos usuarios</li>
+                <li>Solicitar credenciales a administradores</li>
               </ul>
             </div>
           </div>
