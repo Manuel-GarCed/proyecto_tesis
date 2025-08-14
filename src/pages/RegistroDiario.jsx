@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Modal from '../components/Modal';
 import useWaterPrediction from '../services/useWaterPrediction';
 import RegressionChart from '../components/RegressionChart';
-import useDailyHumidity from '../services/useDailyHumidity'
-
-import { useMemo } from 'react'
+import useDailyHumidity from '../services/useDailyHumidity';
+import { fitHumidityToWater } from '../services/regressionService';
 
 import {
   fetchRecords,
@@ -14,21 +13,51 @@ import {
 } from '../services/dailyRecordService';
 
 export default function RegistroDiario() {
-  const dailyHumidity = useDailyHumidity()
-  const [predModalRec, setPredModalRec] = useState(null)
-  const waterPrediction = useWaterPrediction();  // ← aquí tenemos la predicción
+  const dailyHumidity = useDailyHumidity();
+  const [predModalRec, setPredModalRec] = useState(null);
+  const waterPrediction = useWaterPrediction(); // predicción numérica
   const [records, setRecords] = useState([]);
-  const [form, setForm]       = useState({
+
+  const [form, setForm] = useState({
     date: new Date().toISOString().slice(0, 10),
     water: '',
     fertilizer: '',
     waste: '',
     energy: ''
   });
-  const [error, setError]           = useState('');
-  const [editRec, setEditRec]       = useState(null);
-  const [delRecId, setDelRecId]     = useState(null);
+
+  const [error, setError] = useState('');
+  const [editRec, setEditRec] = useState(null);
+  const [delRecId, setDelRecId] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
+
+  // === Set de IDs predichos (persistencia local) ===
+  const [predictedIds, setPredictedIds] = useState(() => {
+    try {
+      const arr = JSON.parse(localStorage.getItem('predictedIds') || '[]');
+      return new Set(arr);
+    } catch {
+      return new Set();
+    }
+  });
+
+  const addPredictedId = (id) => {
+    setPredictedIds(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      localStorage.setItem('predictedIds', JSON.stringify([...next]));
+      return next;
+    });
+  };
+
+  const removePredictedId = (id) => {
+    setPredictedIds(prev => {
+      const next = new Set(prev);
+      next.delete(id);
+      localStorage.setItem('predictedIds', JSON.stringify([...next]));
+      return next;
+    });
+  };
 
   // 1) Carga inicial
   useEffect(() => {
@@ -48,6 +77,7 @@ export default function RegistroDiario() {
     e.preventDefault();
     setError('');
     const { date, water, fertilizer, waste, energy } = form;
+
     if (!date || !water || !fertilizer || !waste || !energy) {
       setError('Todos los campos son obligatorios');
       return;
@@ -56,10 +86,11 @@ export default function RegistroDiario() {
       setError('Ya existe un registro para esa fecha');
       return;
     }
-    if (water < 0 || fertilizer < 0 || waste < 0 || energy < 0) { //Esta seccion
-      setError('Datos ingresados inválidos');       // me impide colocar
-      return;                                      // numeros menores a 0
+    if (water < 0 || fertilizer < 0 || waste < 0 || energy < 0) {
+      setError('Datos ingresados inválidos');
+      return;
     }
+
     try {
       const newRec = await createRecord({
         date,
@@ -69,7 +100,7 @@ export default function RegistroDiario() {
         energy: Number(energy)
       });
       setRecords(rs => [...rs, newRec]);
-      setForm(f => ({ ...f, water: '', fertilizer: '', waste: '', energy: ''}));
+      setForm(f => ({ ...f, water: '', fertilizer: '', waste: '', energy: '' }));
     } catch (err) {
       setError(err.message);
     }
@@ -77,100 +108,109 @@ export default function RegistroDiario() {
 
   // 4) Abrir modal edición
   const openEdit = rec => {
-    setEditRec({ ...rec }); 
+    setEditRec({ ...rec });
     setError('');
   };
 
-  // 3) Rellenar con predicción **Y** actualizar el array local
+  // 5) Rellenar con predicción y actualizar array local (marca predicho)
   function fillWaterWithPrediction(event) {
-    event.preventDefault();           // por si acaso
+    event.preventDefault();
     if (waterPrediction == null) {
       setError('Necesitas al menos 2 registros para predecir');
       return;
     }
     const predValue = Number(waterPrediction.toFixed(2));
- 
-    // 3a) Actualiza sólo el editRec (input del modal)
+
+    // Calcula m,b de la regresión Humedad -> Agua
+    const dailyWater = records.map(r => ({ date: r.date, water: Number(r.water) }));
+    const { m, b } = fitHumidityToWater(dailyWater, dailyHumidity);
+
+    // Marca en el modal
     setEditRec(er => ({
       ...er,
       water: predValue,
-      predicted: true
+      predicted: true,
+      predMeta: { m, b }
     }));
- 
-    // 3b) Y actualiza tu tabla en pantalla
+
+    // Marca en la tabla visible
     setRecords(rs =>
       rs.map(r =>
         r.id === editRec.id
-          ? { ...r, water: predValue, predicted: true }
+          ? { ...r, water: predValue, predicted: true, predMeta: { m, b } }
           : r
       )
     );
+
+    // Mantén este registro como "predicho" en el set
+    addPredictedId(editRec.id);
   }
 
+  // 6) Confirmar edición (guardar)
+  const handleUpdate = async () => {
+    const { water, fertilizer, waste, energy, predicted, predMeta } = editRec;
 
-  // 5) Confirmar edición
-const handleUpdate = async () => {
-  // 1) Extraemos también el campo `predicted` de editRec
-  const { water, fertilizer, waste, energy, predicted } = editRec;
+    if (
+      water === '' || fertilizer === '' ||
+      waste === '' || energy === ''
+    ) {
+      setError('Todos los campos son obligatorios');
+      return;
+    }
+    if (water < 0 || fertilizer < 0 || waste < 0 || energy < 0) {
+      setError('Datos ingresados inválidos');
+      return;
+    }
 
-  // 2) Validación de campos obligatorios / valores negativos
-  if (
-    water === '' || fertilizer === '' ||
-    waste === '' || energy === ''
-  ) {
-    setError('Todos los campos son obligatorios');
-    return;
-  }
-  if (water < 0 || fertilizer < 0 || waste < 0 || energy < 0) {
-    setError('Datos ingresados inválidos');
-    return;
-  }
+    setError('');
+    setConfirmLoading(true);
 
-  setError('');
-  setConfirmLoading(true);
+    try {
+      const body = {
+        water: Number(water),
+        fertilizer: Number(fertilizer),
+        waste: Number(waste),
+        energy: Number(energy),
+        // si tu API lo soporta:
+        predicted: predicted === true,
+        predMeta: predMeta || null
+      };
 
-  try {
-    // 3) Llamamos al API para actualizar
-    const upd = await updateRecord(editRec.id, {
-      water:      Number(water),
-      fertilizer: Number(fertilizer),
-      waste:      Number(waste),
-      energy:     Number(energy)
-    });
+      const upd = await updateRecord(editRec.id, body);
 
-    // 4) Armamos el objeto final incluyendo el flag `predicted`
-    const updatedRecord = {
-      ...upd,
-      predicted: predicted === true
-    };
+      // Reinyecta predicted/predMeta por si backend no los devuelve
+      const updatedRecord = {
+        ...upd,
+        predicted: predicted === true,
+        predMeta: predMeta || upd.predMeta || null
+      };
 
-    // 5) Reemplazamos en el estado
-    setRecords(rs =>
-      rs.map(r => (r.id === updatedRecord.id ? updatedRecord : r))
-    );
+      setRecords(rs =>
+        rs.map(r =>
+          String(r.id) === String(updatedRecord.id) ? updatedRecord : r
+        )
+      );
 
-    // 6) Cerramos modal y limpiamos editRec
-    setEditRec(null);
-  } catch (err) {
-    setError(err.message);
-  } finally {
-    setConfirmLoading(false);
-  }
-};
+      if (updatedRecord.predicted) addPredictedId(updatedRecord.id);
 
+      setEditRec(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
 
- // 5b) función para rellenar con la predicción
-
-
-  // 6) Abrir modal eliminar
+  // 7) Abrir modal eliminar
   const openDelete = id => setDelRecId(id);
 
-  // 7) Confirmar eliminación
+  // 8) Confirmar eliminación
   const handleDelete = async () => {
     setConfirmLoading(true);
     try {
       await deleteRecord(delRecId);
       setRecords(rs => rs.filter(r => r.id !== delRecId));
+      removePredictedId(delRecId);
       setDelRecId(null);
     } catch (err) {
       setError(err.message);
@@ -235,11 +275,10 @@ const handleUpdate = async () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Energía (MWh)
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Energía (MWh)</label>
           <input
-            type="number" step="any"
+            type="number"
+            step="any"
             name="energy"
             value={form.energy}
             onChange={handleChange}
@@ -250,8 +289,7 @@ const handleUpdate = async () => {
         <div>
           <button
             type="submit"
-            className="w-full py-2 px-4 bg-cielo-oscuro cursor-pointer
-                    text-white rounded-md hover:bg-cielo transition"
+            className="w-full py-2 px-4 bg-cielo-oscuro cursor-pointer text-white rounded-md hover:bg-cielo transition"
           >
             Guardar
           </button>
@@ -277,44 +315,42 @@ const handleUpdate = async () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 text-center">
-            {records.map(r => (
-              <tr key={r.id} className='hover:bg-gray-100'>
-                <td className="px-4 py-2 text-sm">{r.id}</td>
-                <td className="px-4 py-2 text-sm">{r.date}</td>
-                <td
-                  className={`px-4 py-2 text-sm ${r.predicted ? 'text-green-600 font-semibold cursor-pointer' : ''}`}
-                  onClick={() => {
-                    if (r.predicted) setPredModalRec(r);
-                  }}
-                >
-                  {r.water}
-                </td>
-                <td className="px-4 py-2 text-sm">{r.fertilizer}</td>
-                <td className="px-4 py-2 text-sm">{r.waste}</td>
-                <td className="px-4 py-2 text-sm">{r.energy}</td>
-                <td className="px-4 py-2 text-sm space-x-2">
-                  <button
-                    onClick={() => openEdit(r)}
-                    className="text-sm text-white bg-cielo-oscuro
-                          hover:bg-cielo px-3 py-1 rounded
-                          transition cursor-pointer"
+            {records.map(r => {
+              const isPred = r.predicted || predictedIds.has(r.id);
+              return (
+                <tr key={r.id} className="hover:bg-gray-100">
+                  <td className="px-4 py-2 text-sm">{r.id}</td>
+                  <td className="px-4 py-2 text-sm">{r.date}</td>
+                  <td
+                    className={`px-4 py-2 text-sm ${isPred ? 'text-green-600 font-semibold cursor-pointer' : ''}`}
+                    onClick={() => { if (isPred) setPredModalRec(r); }}
                   >
-                    Modificar
-                  </button>
-                  <button
-                    onClick={() => openDelete(r.id)}
-                    className="text-sm text-white bg-red-600
-                          hover:bg-red-700 px-3 py-1 rounded
-                          transition cursor-pointer"
-                  >
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-            ))}
+                    {r.water}
+                  </td>
+                  <td className="px-4 py-2 text-sm">{r.fertilizer}</td>
+                  <td className="px-4 py-2 text-sm">{r.waste}</td>
+                  <td className="px-4 py-2 text-sm">{r.energy}</td>
+                  <td className="px-4 py-2 text-sm space-x-2">
+                    <button
+                      onClick={() => openEdit(r)}
+                      className="text-sm text-white bg-cielo-oscuro hover:bg-cielo px-3 py-1 rounded transition cursor-pointer"
+                    >
+                      Modificar
+                    </button>
+                    <button
+                      onClick={() => openDelete(r.id)}
+                      className="text-sm text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded transition cursor-pointer"
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+
             {records.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-400">
+                <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
                   No hay registros aún.
                 </td>
               </tr>
@@ -330,16 +366,13 @@ const handleUpdate = async () => {
         </h3>
         {editRec && (
           <div className="space-y-4">
-            {/* Recorremos cada campo, pero tratamos "water" especial */}
             {['water','fertilizer','waste','energy'].map((field) => {
-              // Etiqueta según campo
               let label;
               if (field === 'energy') label = 'Energía (MWh)';
               else if (field === 'water') label = 'Agua (L)';
               else if (field === 'fertilizer') label = 'Fertilizantes (g)';
               else label = 'Residuos (kg)';
 
-              // Si es water, mostramos input + botón de predecir
               if (field === 'water') {
                 return (
                   <div key={field}>
@@ -366,7 +399,6 @@ const handleUpdate = async () => {
                 );
               }
 
-              // Para los demás campos solo el input
               return (
                 <div key={field}>
                   <label className="block text-sm">{label}</label>
@@ -429,16 +461,25 @@ const handleUpdate = async () => {
       {predModalRec && (
         <Modal isOpen onClose={() => setPredModalRec(null)}>
           <h3>Regresión Humedad → Consumo de Agua</h3>
-          <div className="modal-chart">
+          <div className="modal-chart mb-2">
             <RegressionChart
               allRecords={records}
               dailyHumidity={dailyHumidity}
               predictedRecord={predModalRec}
             />
           </div>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setPredModalRec(null)}
+              className="px-4 py-2 bg-cielo-oscuro text-white rounded hover:bg-cielo cursor-pointer"
+            >
+              Aceptar
+            </button>
+          </div>
+
         </Modal>
       )}
-      
     </div>
   );
 }

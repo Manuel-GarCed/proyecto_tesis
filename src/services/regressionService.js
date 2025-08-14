@@ -1,24 +1,26 @@
 import regression from 'regression';
 
 /**
- * Dado un array de registros con fecha y valor numérico,
- * devuelve la predicción para el siguiente índice (por ejemplo, siguiente día).
- *
- * @param {Array<{ date: string, value: number }>} data
- * @returns {number} Valor predicho
+ * Ajusta una regresión lineal Humedad (x) -> Agua (y) y devuelve { m, b }.
+ * dailyWater: [{ date, water }]
+ * dailyHumidity: [{ date, humidity }]
  */
-export function predictNext(data) {
-  // 1) Convertimos a pares [índice, valor]
-  //    Aquí asumimos que data está ordenado cronológicamente.
-  const points = data.map((row, i) => [i, row.value]);
+export function fitHumidityToWater(dailyWater, dailyHumidity) {
+  const humMap = Object.fromEntries(
+    dailyHumidity.map(h => [h.date, Number(h.humidity)])
+  );
 
-  // 2) Ajustamos la regresión lineal
+  const points = dailyWater
+    .map(w => {
+      const x = humMap[w.date];
+      const y = Number(w.water);
+      return Number.isFinite(x) && Number.isFinite(y) ? [x, y] : null;
+    })
+    .filter(Boolean);
+
+  if (points.length < 2) return { m: NaN, b: NaN };
+
   const result = regression.linear(points);
-
-  // 3) Pedimos la predicción para el siguiente índice
-  //    result.predict(x) → [x, y_pred]
-  const nextIndex = points.length;
-  const [, yPred] = result.predict(nextIndex);
-
-  return yPred;
+  const [m, b] = result.equation; // pendiente e intercepto
+  return { m, b };
 }
