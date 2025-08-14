@@ -70,17 +70,12 @@ export default function DailyHumidityChart({ data = [] }) {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="date"
-            interval={0}
-            height={40}
-            tickFormatter={iso => {
-              const [y, m, d] = iso.split('-');
-              return `${d}/${m}`;
-            }}
-            tick={{ angle: -45, textAnchor: 'end' }}
-            padding={{ left: 10, right: 10 }}
+            tick={false}
+            tickLine={false}
+            axisLine={false}
           />
           <YAxis
-            domain={[45, 70]}
+            domain={['dataMin - 5', 'dataMax + 5']}
             label={{
                 value: '%',
                 angle: -90,

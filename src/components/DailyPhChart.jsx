@@ -58,14 +58,9 @@ export default function DailyPhChart({ data = [] }) {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="date"
-            interval={0}
-            height={40}
-            tickFormatter={iso => {
-              const [y, m, d] = iso.split('-');
-              return `${d}/${m}`;
-            }}
-            tick={{ angle: -45, textAnchor: 'end' }}
-            padding={{ left: 10, right: 10 }}
+            tick={false}
+            tickLine={false}
+            axisLine={false}
           />
           <YAxis
             domain={['dataMin - 0.5', 'dataMax + 0.5']}

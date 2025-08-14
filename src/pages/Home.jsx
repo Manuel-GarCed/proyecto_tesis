@@ -98,17 +98,7 @@ export default function Home() {
         <DailyTemperatureChart data={data}/>
         <DailyPhChart          data={data}/>
       </div>
-      <div className="bg-white p-4 rounded-lg shadow">
-        <h2 className="text-xl font-semibold mb-2">Predicción Consumo de Agua</h2>
-        {waterPred !== null ? (
-          <p className="text-3xl">
-            {waterPred} L <span className="text-sm text-gray-500">próximo día</span>
-          </p>
-        ) : (
-          <p className="text-gray-500">Necesitas al menos 2 registros</p>
-        )}
-      </div>
-      
+            
     </div>
   );
 }
